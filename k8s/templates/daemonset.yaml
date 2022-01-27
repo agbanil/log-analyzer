@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "gatsbytakehome.fullname" . }}
+  namespace: kube-system
+  labels:
+    {{- include "gatsbytakehome.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "gatsbytakehome.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "gatsbytakehome.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "gatsbytakehome.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - name: config
+            mountPath: /usr/share/gatsbytakehome
+            readOnly: true
+          env:
+          - name: FILE_PATHS
+            valueFrom:
+              configMapKeyRef:
+                name: {{ include "gatsbytakehome.fullname" . }}-config
+                key: log_files  
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "gatsbytakehome.fullname" . }}-config
+          items:
+            - key: log.txt
+              path: log.txt
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
