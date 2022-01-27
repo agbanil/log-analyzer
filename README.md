@@ -11,7 +11,7 @@ what do we have here?
 - [Running Tests](#Running-Tests)
 - [Deployment](#Deployment)
   - [Helm](#Helm)
-- [Known Bugs/Issues](#Known-BugsIssues)
+- [Improvements](#Improvements)
 
 ## Objective
 
@@ -107,6 +107,9 @@ There is an infrastructure config for this in [this repo](https://github.com/raz
 follow the instructions in order to setup a kubernetes infrastructure on AWS before running the `helm install` if you don't 
 already have a kubernetes cluster to run this on.
 
-## Known Bugs/Issues
+## Improvements
 
-- Currently, new reading results are printed when there's a new line with a new device.
+- Currently, new reading results are printed when there's a new line with a new device. The improvement here would be to print
+all the values as they're calculated.
+- Improve on how the results are being displayed. Currently, since it's tailing the file, it displays for every device as it gets
+the results
